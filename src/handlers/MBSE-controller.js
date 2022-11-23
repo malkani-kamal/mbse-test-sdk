@@ -66,6 +66,7 @@ class TokenController {
 			// let tokenData = JSON.parse(tokenDef);
 			console.log('----------Creating MBSE details------------\n', tokenDef)
 			let stateTxn = contract.createTransaction('CreateDetailedMBSEModelPrivate');
+			stateTxn.setEndorsingOrganizations('Org1MSP');
 			let tx = await stateTxn.submit(JSON.stringify(tokenDef));
 			console.log('*** MBSE Details Added: committed');
 			// let tx ='xxxxxxxxxxxxxxxxx'
@@ -84,6 +85,7 @@ class TokenController {
 		}
 	}
 	
+	//new
 	async updateMBSEPrivateDetails(req, res, next) {
 		try {
 			console.log('*******Update MBSE Details *******')
@@ -98,6 +100,7 @@ class TokenController {
 			// let tokenData = JSON.parse(tokenDef);
 			console.log('----------Creating MBSE details------------\n', tokenDef)
 			let stateTxn = contract.createTransaction('UpdateDetailedMBSEModelPrivate');
+			stateTxn.setEndorsingOrganizations('Org1MSP');
 			let tx = await stateTxn.submit(JSON.stringify(tokenDef));
 			console.log('*** MBSE Details Update: committed');
 			// let tx ='xxxxxxxxxxxxxxxxx'
@@ -179,6 +182,74 @@ async addMBSESummary(req, res, next) {
 	} catch (error) {
 		console.log(error.message)
 		logger.error({ userInfo: req.loggerInfo, method: 'CreateSummaryMBSEModel', error })
+		return res.status(500).send({
+			status: false,
+			message: error.message
+		});
+	}
+}
+
+
+
+async updateMBSESummary(req, res, next) {
+	try {
+		console.log('*******updateMBSESummary  *******')
+
+		let orgId = req.body.ownerOrgId;
+		let orgName = "org" + orgId
+		let user = req.body.userId;
+		let tokenDef = req.body.data;
+
+		const gateway = new Gateway();
+		let contract = await getContractObject(orgName, user, NETWORK_PARAMETERS.CHANNEL_NAME, NETWORK_PARAMETERS.CHAINCODE_NAME, gateway)
+		// let tokenData = JSON.parse(tokenDef);
+		console.log('----------Updating MBSE details------------\n', tokenDef)
+		let stateTxn = contract.createTransaction('UpdateSummaryMBSEModel');
+		let tx = await stateTxn.submit(JSON.stringify(tokenDef));
+		console.log('*** MBSE Summary Updated: committed');
+		// let tx ='xxxxxxxxxxxxxxxxx'
+		return res.status(200).send({
+			status: true,
+			message: "MBSE Summary Updated Successfully",
+			txid: tx.toString()
+		});
+	} catch (error) {
+		console.log(error.message)
+		logger.error({ userInfo: req.loggerInfo, method: 'updateMBSESummary', error })
+		return res.status(500).send({
+			status: false,
+			message: error.message
+		});
+	}
+}
+
+
+//new
+async getMBSEPrivateDetails(req, res, next) {
+	try {
+		console.log('*******Delete MBSE Details *******')
+
+		let orgId = req.body.ownerOrgId;
+		let orgName = "org" + orgId
+		let user = req.body.userId;
+		let mbseId = req.body.mbseId;
+		
+		console.log("mbseId----------", mbseId)
+		const gateway = new Gateway();
+		console.log('----------Fetching my MBSE details------------\n', mbseId)
+		let contract = await getContractObject(orgName, user, NETWORK_PARAMETERS.CHANNEL_NAME, NETWORK_PARAMETERS.CHAINCODE_NAME, gateway)
+		// let stateTxn = contract.createTransaction('GetDetailedMBSEModelPrivate');
+		// stateTxn.setEndorsingOrganizations('Org1MSP');
+		let result = await contract.evaluateTransaction('GetDetailedMBSEModelPrivate', mbseId);
+		result = JSON.parse(result.toString())
+		return res.status(200).send({
+			success: true,
+			message: `Detail MBSE created successfully`,
+			payload: result
+		});
+	} catch (error) {
+		console.log(error.message)
+		logger.error({ userInfo: req.loggerInfo, method: 'getMBSEPrivateDetails', error })
 		return res.status(500).send({
 			status: false,
 			message: error.message

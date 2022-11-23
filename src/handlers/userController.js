@@ -21,6 +21,7 @@ exports.registerEnrollUser = async (req, res, next) => {
 	let user = req.body.userId;
 	let orgRole =  req.body.orgRole;
 	let userRole =  req.body.userRole;
+	let organizationName = req.body.OrganizationName;
 
 	let caOrg;
 	let walletPath;
@@ -52,14 +53,14 @@ exports.registerEnrollUser = async (req, res, next) => {
 	}
 
 	logger.info({userInfo: req.loggerInfo, method:'registerEnrollUser'})
-	console.log("org:", org,", user:", user, ", orgRole:", orgRole, ", userRole:", userRole )
+	console.log("org:", org,", user:", user, ", orgRole:", orgRole, ", userRole:", userRole, ", org", organizationName )
     
 	const ccpOrg = buildCCPOrg(org);
     const caOrgClient = buildCAClient(FabricCAServices, ccpOrg, caOrg);
 	const walletPathOrg = path.join(__dirname, walletPath);
   	const walletOrg = await buildWallet(Wallets, walletPathOrg);
 
-	let response = await registerAndEnrollUser(caOrgClient, walletOrg, mspOrg, user, department, orgRole, userRole);
+	let response = await registerAndEnrollUser(caOrgClient, walletOrg, mspOrg, user, department, orgRole, userRole, organizationName);
 	if(response == 'true') {
 		return res.status(200).send({ success: true,
             		message: "Successfully registered user" });

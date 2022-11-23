@@ -60,7 +60,7 @@ exports.enrollAdmin = async (caClient, wallet, orgMspId) => {
 	}
 };
 
-exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affiliation, OrgRole, UserRole) => {
+exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affiliation, OrgRole, UserRole, OrgName) => {
 	try {
 		console.log('registerAndEnrollUser', userId)
 
@@ -93,6 +93,7 @@ exports.registerAndEnrollUser = async (caClient, wallet, orgMspId, userId, affil
 			attrs: [
 				{ name: "orgRole", value: OrgRole, ecert: true },
 				{ name: "userRole", value: UserRole, ecert: true },
+				{ name: "organizationName", value: OrgName, ecert: true }
 			]
 		}, adminUser);
 		const enrollment = await caClient.enroll({
